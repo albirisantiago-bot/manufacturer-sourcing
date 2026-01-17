@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered manufacturer sourcing tool for e-commerce packaging suppliers">
+    <meta name="author" content="E-commerce Denmark">
+    <title>Manufacturer Sourcing Pro | AI-Powered Search</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #0A4D3C;
+            --primary-light: #0F6B52;
+            --accent: #F59E0B;
+            --bg-dark: #0D1117;
+            --bg-card: #161B22;
+            --border: #30363D;
+            --text: #E6EDF3;
+            --text-muted: #8B949E;
+            --success: #238636;
+            --warning: #D29922;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #0D1117 0%, #1A1F2E 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(15, 107, 82, 0.1) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            font-family: 'Space Mono', monospace;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .info-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .info-box h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        input, select, textarea {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(15, 107, 82, 0.2);
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(15, 107, 82, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            margin-left: 1rem;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        #loadingSpinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary-light);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-steps {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(15, 107, 82, 0.1);
+            border-radius: 8px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            color: var(--text-muted);
+        }
+        
+        .step.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .step.complete {
+            color: var(--success);
+        }
+        
+        .step-icon {
+            margin-right: 0.5rem;
+        }
+        
+        #results {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .results-header h2 {
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+        
+        .results-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        thead {
+            background: var(--bg-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: rgba(15, 107, 82, 0.1);
+        }
+        
+        td {
+            padding: 1rem;
+            color: var(--text);
+        }
+        
+        .source-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .source-google {
+            background: rgba(66, 133, 244, 0.2);
+            color: #4285F4;
+        }
+        
+        .source-web {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+        
+        .country-flag {
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            word-break: break-all;
+        }
+        
+        a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+        
+        .comments-cell {
+            max-width: 300px;
+        }
+        
+        .export-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(15, 107, 82, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .export-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .export-icon {
+            font-size: 2rem;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .toast.error {
+            background: #DA3633;
+        }
+        
+        .toast.warning {
+            background: var(--warning);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .form-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-secondary {
+                margin-left: 0;
+            }
+            
+            .export-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .table-container {
+                overflow-x: scroll;
+            }
+            
+            .toast {
+                left: 1rem;
+                right: 1rem;
+                bottom: 1rem;
+            }
+        }
+        
+        .instructions {
+            background: var(--bg-dark);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        
+        .instructions h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .instructions ol {
+            margin-left: 1.5rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions code {
+            background: var(--bg-card);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            color: var(--accent);
+        }
+        
+        /* Recommendation Cards */
+        .recommendation-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 107, 82, 0.2);
+        }
+        
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .rec-icon {
+            font-size: 1.5rem;
+        }
+        
+        .rec-header h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .rec-content {
+            min-height: 60px;
+        }
+        
+        .rec-company {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rec-reason {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .country-insights {
+            background: rgba(15, 107, 82, 0.1);
+            border-left: 3px solid var(--primary-light);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .country-insights h4 {
+            margin: 0;
+        }
+        
+        .insight-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0.75rem;
+        }
+        
+        .insight-list li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .insight-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏭 Manufacturer Sourcing Pro</h1>
+            <p class="subtitle">AI-Powered Supplier Search · E-commerce Denmark</p>
+            <span class="badge">✨ Free & Open Source</span>
+        </header>
+        
+        <div class="main-card">
+            <div class="info-box">
+                <h3>🚀 How it works</h3>
+                <p>
+                    Search for packaging manufacturers by product type and country. 
+                    Results are automatically formatted for Google Sheets import with all contact details.
+                    100% free, no registration required, works offline!
+                </p>
+            </div>
+            
+            <form id="searchForm">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="productType">📦 Product Type *</label>
+                        <input 
+                            type="text" 
+                            id="productType" 
+                            placeholder="e.g., takeaway boxes, cake boxes, pizza boxes"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="country">🌍 Country *</label>
+                        <select id="country" required>
+                            <option value="">Select country...</option>
+                            <optgroup label="🌟 Priority Countries">
+                                <option value="Turkey">Turkey (Türkiye) 🇹🇷</option>
+                                <option value="Poland">Poland 🇵🇱</option>
+                                <option value="Germany">Germany 🇩🇪</option>
+                            </optgroup>
+                            <optgroup label="🇪🇺 European Union Members">
+                                <option value="Austria">Austria 🇦🇹</option>
+                                <option value="Belgium">Belgium 🇧🇪</option>
+                                <option value="Bulgaria">Bulgaria 🇧🇬</option>
+                                <option value="Croatia">Croatia 🇭🇷</option>
+                                <option value="Cyprus">Cyprus 🇨🇾</option>
+                                <option value="Czech Republic">Czech Republic 🇨🇿</option>
+                                <option value="Denmark">Denmark 🇩🇰</option>
+                                <option value="Estonia">Estonia 🇪🇪</option>
+                                <option value="Finland">Finland 🇫🇮</option>
+                                <option value="France">France 🇫🇷</option>
+                                <option value="Germany">Germany 🇩🇪</option>
+                                <option value="Greece">Greece 🇬🇷</option>
+                                <option value="Hungary">Hungary 🇭🇺</option>
+                                <option value="Ireland">Ireland 🇮🇪</option>
+                                <option value="Italy">Italy 🇮🇹</option>
+                                <option value="Latvia">Latvia 🇱🇻</option>
+                                <option value="Lithuania">Lithuania 🇱🇹</option>
+                                <option value="Luxembourg">Luxembourg 🇱🇺</option>
+                                <option value="Malta">Malta 🇲🇹</option>
+                                <option value="Netherlands">Netherlands 🇳🇱</option>
+                                <option value="Poland">Poland 🇵🇱</option>
+                                <option value="Portugal">Portugal 🇵🇹</option>
+                                <option value="Romania">Romania 🇷🇴</option>
+                                <option value="Slovakia">Slovakia 🇸🇰</option>
+                                <option value="Slovenia">Slovenia 🇸🇮</option>
+                                <option value="Spain">Spain 🇪🇸</option>
+                                <option value="Sweden">Sweden 🇸🇪</option>
+                            </optgroup>
+                            <optgroup label="🇬🇧 United Kingdom">
+                                <option value="United Kingdom">United Kingdom 🇬🇧</option>
+                            </optgroup>
+                            <optgroup label="⚡ Baltic States">
+                                <option value="Estonia">Estonia 🇪🇪</option>
+                                <option value="Latvia">Latvia 🇱🇻</option>
+                                <option value="Lithuania">Lithuania 🇱🇹</option>
+                            </optgroup>
+                            <optgroup label="🏔️ Balkan States">
+                                <option value="Albania">Albania 🇦🇱</option>
+                                <option value="Bosnia and Herzegovina">Bosnia and Herzegovina 🇧🇦</option>
+                                <option value="Bulgaria">Bulgaria 🇧🇬</option>
+                                <option value="Croatia">Croatia 🇭🇷</option>
+                                <option value="Greece">Greece 🇬🇷</option>
+                                <option value="Montenegro">Montenegro 🇲🇪</option>
+                                <option value="North Macedonia">North Macedonia 🇲🇰</option>
+                                <option value="Romania">Romania 🇷🇴</option>
+                                <option value="Serbia">Serbia 🇷🇸</option>
+                                <option value="Slovenia">Slovenia 🇸🇮</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="material">📋 Material (optional)</label>
+                        <select id="material">
+                            <option value="">Any material</option>
+                            <option value="kraft">Kraft</option>
+                            <option value="white cardboard">White Cardboard</option>
+                            <option value="corrugated">Corrugated</option>
+                            <option value="recycled">Recycled</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="additionalCriteria">🎯 Additional Criteria (optional)</label>
+                    <textarea 
+                        id="additionalCriteria" 
+                        placeholder="e.g., PFAS-free required, minimum 10,000 units MOQ, must have ISO certification, etc."
+                    ></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn" id="searchBtn">
+                        🔍 Search Manufacturers
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        🔄 Reset
+                    </button>
+                </div>
+            </form>
+            
+            <div class="instructions">
+                <h3>📊 Google Sheets Export Instructions</h3>
+                <ol>
+                    <li>Click <strong>"Search Manufacturers"</strong> to find suppliers</li>
+                    <li>Review the results in the table below</li>
+                    <li>Click <strong>"Copy for Google Sheets"</strong> to copy formatted data</li>
+                    <li>Open Google Sheets and paste (Ctrl+V / Cmd+V)</li>
+                    <li>Data will automatically format into columns!</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div id="loadingSpinner">
+            <div class="main-card">
+                <div class="spinner"></div>
+                <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+                    Searching manufacturers in <strong id="searchingCountry"></strong>...
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Please wait a moment
+                </p>
+                
+                <div class="progress-steps">
+                    <div class="step" id="step1">
+                        <span class="step-icon">🔍</span>
+                        <span>Searching database...</span>
+                    </div>
+                    <div class="step" id="step2">
+                        <span class="step-icon">📊</span>
+                        <span>Extracting manufacturer data...</span>
+                    </div>
+                    <div class="step" id="step3">
+                        <span class="step-icon">✅</span>
+                        <span>Formatting results...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" style="display: none;">
+            <div class="main-card">
+                <div class="results-header">
+                    <h2>🎯 Search Results</h2>
+                    <span class="results-count" id="resultsCount">0 manufacturers</span>
+                </div>
+                
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Source</th>
+                                <th>Company</th>
+                                <th>Comments</th>
+                                <th>Special Reference</th>
+                                <th>Country</th>
+                                <th>Website</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="export-section">
+                    <div class="export-info">
+                        <span class="export-icon">📊</span>
+                        <div>
+                            <h3 style="margin-bottom: 0.25rem;">Ready to export to Google Sheets</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                                Data formatted with tabs for perfect import
+                            </p>
+                        </div>
+                    </div>
+                    <div class="export-buttons">
+                        <button class="btn" onclick="copyForSheets()">
+                            📋 Copy for Google Sheets
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadTSV()">
+                            💾 Download TSV
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Smart Recommendations Section -->
+                <div id="recommendations" style="margin-top: 2rem; display: none;">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem; font-size: 1.3rem;">
+                        🎯 Smart Recommendations for Your Search
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <!-- Best Value Card -->
+                        <div class="recommendation-card">
+                            <div class="rec-header">
+                                <span class="rec-icon">💎</span>
+                                <h4>Best Value</h4>
+                            </div>
+                            <div id="recBestValue" class="rec-content">
+                                <div class="rec-company">-</div>
+                                <div class="rec-reason">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fastest Delivery Card -->
+                        <div class="recommendation-card">
+                            <div class="rec-header">
+                                <span class="rec-icon">⚡</span>
+                                <h4>Fastest Delivery</h4>
+                            </div>
+                            <div id="recFastest" class="rec-content">
+                                <div class="rec-company">-</div>
+                                <div class="rec-reason">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Best Price Card -->
+                        <div class="recommendation-card">
+                            <div class="rec-header">
+                                <span class="rec-icon">💰</span>
+                                <h4>Best Price</h4>
+                            </div>
+                            <div id="recBestPrice" class="rec-content">
+                                <div class="rec-company">-</div>
+                                <div class="rec-reason">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Premium Quality Card -->
+                        <div class="recommendation-card">
+                            <div class="rec-header">
+                                <span class="rec-icon">🏆</span>
+                                <h4>Premium Quality</h4>
+                            </div>
+                            <div id="recPremium" class="rec-content">
+                                <div class="rec-company">-</div>
+                                <div class="rec-reason">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Eco-Friendly Card -->
+                        <div class="recommendation-card">
+                            <div class="rec-header">
+                                <span class="rec-icon">🌱</span>
+                                <h4>Eco-Friendly</h4>
+                            </div>
+                            <div id="recEco" class="rec-content">
+                                <div class="rec-company">-</div>
+                                <div class="rec-reason">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Large Volume Card -->
+                        <div class="recommendation-card">
+                            <div class="rec-header">
+                                <span class="rec-icon">📦</span>
+                                <h4>Large Volume</h4>
+                            </div>
+                            <div id="recVolume" class="rec-content">
+                                <div class="rec-company">-</div>
+                                <div class="rec-reason">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Country Insights -->
+                    <div class="country-insights">
+                        <h4 style="color: var(--accent); margin-bottom: 0.75rem;">
+                            📍 Country Insights: <span id="insightCountry">-</span>
+                        </h4>
+                        <div id="countryInsightContent" style="color: var(--text-muted); line-height: 1.8;">
+                            -
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Made with ❤️ for E-commerce Denmark</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com" target="_blank">View on GitHub</a> · 
+                Open Source · Free Forever
+            </p>
+        </footer>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
